@@ -1,0 +1,24 @@
+fastapi
+uvicorn
+
+#for template
+jinja2
+
+#for static files
+aiofiles
+
+#for database
+sqlalchemy
+
+#for email validation
+pydantic[email]
+
+#hashing
+passlib[bcrypt]
+
+#for testing
+pytest
+requests
+
+#for formatting
+pre-commit
