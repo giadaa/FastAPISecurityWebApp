@@ -1,3 +1,5 @@
+from apis.version1.route_login import get_current_user_from_token
+from apis.version1.route_login import is_user_logged_in
 from db.repository.users import create_new_user
 from db.session import get_db
 from fastapi import APIRouter
@@ -5,6 +7,7 @@ from fastapi import Depends
 from fastapi import Request
 from fastapi import responses
 from fastapi import status
+from fastapi.security.utils import get_authorization_scheme_param
 from fastapi.templating import Jinja2Templates
 from schemas.users import UserCreate
 from sqlalchemy.exc import IntegrityError
@@ -17,8 +20,17 @@ router = APIRouter(include_in_schema=False)
 
 
 @router.get("/register/")
-def register(request: Request):
-    return templates.TemplateResponse("users/register.html", {"request": request})
+def register(request: Request, db: Session = Depends(get_db)):
+    token = request.cookies.get("access_token")
+    _, param = get_authorization_scheme_param(token)
+    is_logged_in = is_user_logged_in(token=param, db=db)
+    user = None
+    if is_logged_in:
+        user = get_current_user_from_token(token=param, db=db).username
+    return templates.TemplateResponse(
+        "users/register.html",
+        {"request": request, "is_authenticated": is_logged_in, "user": user},
+    )
 
 
 @router.post("/register/")

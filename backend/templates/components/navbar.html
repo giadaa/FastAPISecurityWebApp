@@ -12,20 +12,40 @@
             <a class="nav-link active" aria-current="page" href="/">Home</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="#">Link</a>
+            <a class="nav-link" href="/register/">Create New Account</a>
           </li>
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-              Dropdown
+              Database Tools
             </a>
             <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-              <li><a class="dropdown-item" href="/post-a-job/">Add</a></li>
-              <li><a class="dropdown-item" href="#">Update</a></li>
-              <li><hr class="dropdown-divider"></li>
-              <li><a class="dropdown-item" href="/delete-job/">Delete</a></li>
+              <li><a class="dropdown-item" href="/post-a-dependency/">Add Item</a></li>
             </ul>
           </li>
+          {% if is_authenticated %}
+          <li class="nav-item">
+            <form method="get" action="/logout/">
+              <button type="submit" class="btn btn-dark">Logout</a>
+            </form>
+          </li>
+          {% endif %}
+          {% if not is_authenticated %}
+          <li class="nav-item">
+            <form method="get" action="/login/">
+              <button type="submit" class="btn btn-dark">Login</a>
+            </form>
+          </li>
+          {% endif %}
+
         </ul>
+
       </div>
+      <div class="position-relative top-0 end-0">
+        <h4>Welcome</h4> {{ user }}
+    </div>
     </div>
   </nav>
+
+<script>
+
+</script>

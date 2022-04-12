@@ -2,7 +2,7 @@
 
 
 {% block title %}
-  <title>Job Board</title>
+  <title>Dependency Updates</title>
 {% endblock %}
 
 {% with msg=msg %}
@@ -10,25 +10,93 @@
 {% endwith %}
 
 {% block content %}
-  <div class="container">
-  <div class="row">
-    <div class="col">
-      <h1 class="display-5">Find Jobs..</h1>
-    </div>
-  </div>
-  <div class="row">
-      {% for job in jobs %}
-        <div class="col-lg-4 col-md-3 col-sm-10 mr-auto">
-          {% with obj=job %}
-      		{% include "components/cards.html" %}
-    	  {% endwith %}
 
-          {% if loop.index %3 %}
-            </div>
-          {% else %}
-            </div></div><br><div class="row">
-          {% endif %}
+  <div class="container">
+    <div class="row text-centre">
+      <h1 class="display-5">View Dependency Updates</h1>
+    </div>
+    <div class="text-danger font-weight-bold">
+      {% for error in errors %}
+        <li>{{error}}</li>
       {% endfor %}
+      {% if msg %}
+    <div class="badge bg-success text-wrap font-weight-bold" style="font-size: large;">
+        {{msg}}
+    </div>
+      {% endif %}
   </div>
-</div>
+    <table id="dependency-table" class="table table-hover">
+      <thead>
+        <tr>
+          <th scope="col">Id</th>
+          <th scope="col">Name</th>
+          <th scope="col">Latest Version</th>
+          <th scope="col">Deadline</th>
+          <th scope="col">Date Posted</th>
+          <th scope="col">Owner</th>
+          <th scope="col">Update</th>
+          <th scope="col">Delete</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for dependency in dependencies %}
+        <tr>
+          <th scope="row">{{ dependency.id }}</th>
+          <td>{{ dependency.name }}</td>
+          <td>{{ dependency.latest_version }}</td>
+          <td>{{ dependency.deadline }}</td>
+          <td>{{ dependency.date_posted }}</td>
+          <td>{{ dependency.owner.username }}</td>
+          <td><button class="btn btn-primary btn-sm" id="update-button" data-bs-toggle="modal" data-bs-target="#confirm-update">Update</button></td>
+          <td><button type="button" class="btn btn-danger btn-sm" id="delete-button" data-bs-toggle="modal" data-bs-target="#confirm-delete">Delete</button></td>
+          <div id="result" class="text-danger text-bold lead"></div>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <div>
+    {% with obj=dependencies %}
+      {% include "components/modals.html" %}
+    {% endwith %}
+  </div>
+
+
+{% endblock %}
+
+{% block scripts %}
+<script type="text/javascript">
+
+  $(document).ready(function() {
+    $("#dependency-table").on('click', '#delete-button', function(){
+      var id = $(this).closest('tr').children('th:eq(0)').text();
+      var name = $(this).closest('tr').children('td:eq(0)').text();
+      document.getElementById('before-itemID').innerHTML="Item ID: "
+      document.getElementById('itemID').innerHTML=id
+      document.getElementById('before-itemName').innerHTML="Item Name: "
+      document.getElementById('itemName').innerHTML=name
+    })
+  $("#dependency-table").on('click', '#update-button', function(){
+      var id = $(this).closest('tr').children('th:eq(0)').text();
+      var name = $(this).closest('tr').children('td:eq(0)').text();
+      var latest_version = $(this).closest('tr').children('td:eq(1)').text();
+      var deadline = $(this).closest('tr').children('td:eq(2)').text();
+      document.getElementById('itemID').innerHTML=id
+      document.getElementById('dependency-name').value=name
+      document.getElementById('dependency-version').value=latest_version
+      document.getElementById('dependency-deadline').value=deadline
+
+      $('#update-form').attr('action', '/update/' + id);
+
+
+    })
+})
+    function delete_dependency(id){
+        fetch('/dependencies/delete/' + id,{
+            method:'DELETE',})
+        .then(response => response.json())
+        .then(document.getElementById('result').innerHTML = "Refreshing...")
+        .then(data => document.getElementById('result').innerHTML = data.detail);
+    }
+</script>
 {% endblock %}

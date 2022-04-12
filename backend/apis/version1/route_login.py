@@ -77,3 +77,24 @@ def get_current_user_from_token(
     if user is None:
         raise credentials_exception
     return user
+
+
+def is_user_logged_in(
+    token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)
+):
+    if token is None or token == "":
+        return False
+    try:
+        payload = jwt.decode(
+            token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]
+        )
+        username: str = payload.get("sub")
+        print("username/email extracted is ", username)
+        if username is None:
+            return False
+    except JWTError:
+        return False
+    user = get_user(username=username, db=db)
+    if user is None:
+        return False
+    return True
