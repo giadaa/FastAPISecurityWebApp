@@ -4,8 +4,7 @@ phases:
       - pip install -r backend/requirements.txt
   build:
     commands:
-      - python -m unittest discover -s my-api
-artifacts:
+      - docker build -t latest .
+      - pytest backend/tests/
   files:
     - '**/*'
-  base-directory: my-api
