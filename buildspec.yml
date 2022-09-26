@@ -7,4 +7,5 @@ phases:
   build:
     commands:
       - docker build -t latest .
+      - export PYTHONPATH=.
       - pytest backend/tests/
